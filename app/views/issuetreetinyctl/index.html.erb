@@ -1,0 +1,83 @@
+<h2><%=l(:issue_tree_title)%></h2>
+
+<%= stylesheet_link_tag "default/style.css", :plugin => "redmine_issue_tree_tiny" %>
+<%= javascript_include_tag "jstree.min.js", :plugin => "redmine_issue_tree_tiny" %>
+
+<input type="button"  onclick="open_all_issue()" value="<%=l(:expand_all)%>" >
+<input type="button"  onclick="close_all_issue()" value="<%=l(:collapse_all)%>" >
+
+<div id="jstree_div"></div>
+<div id="event_result"></div>
+
+<%=@page%> :
+<% for i in 1..@page_count%>
+    <%= link_to i.to_s, {:controller=>'issuetreetinyctl',:action=>'index', :page=>i, :project_id=>@project_id, :limit=>@limit  }  %>
+<%end%>
+
+( <%=(@page-1)*@limit%> - <%=(@page*@limit-1)>(@issues_count-1)?@issues_count-1:@page*@limit-1%> / <%=@issues_count%> )
+<p></p>
+<%=@limit%> :
+<% for i in [10,25,50,100] %>
+    <%= link_to i.to_s, {:controller=>'issuetreetinyctl',:action=>'index', :page=>@page, :project_id=>@project_id, :limit=>i  }  %>
+<%end%>
+
+
+
+<script>
+    url_base = "<%=Redmine::Utils::relative_url_root%>";
+
+    $('#jstree_div')// listen for event
+        .on('changed.jstree', function (e, data) {
+            var i, j, r = [];
+            j = data.selected.length;
+            for(i = 0 ; i < j; i++) {
+                r.push(data.instance.get_node(data.selected[i]).id);
+            }
+            $('#event_result').html('loading... Selected: ' + r.join(', '));
+            if( r.length>0){
+                window.location.href=url_base+'/issues/'+r[0]; //在同当前窗口中打开窗口
+            }
+        })
+        // create the instance
+        .jstree({
+        'core' : {
+            'data' : {
+                'url' : function (node) {
+                    return node.id === '#' ?
+                        url_base+'/issuetreetinyctl/getroot' :
+                        url_base+'/issuetreetinyctl/getchild';
+                },
+                'data' : function (node) {
+                    var pid1="<%= @project_id %>";
+                    if (pid1.length==0)
+                    {//no project id
+                        return node.id === '#' ?{ 'page': <%= @page %>,  'limit':<%=@limit%>}  :    { 'parent_id' : node.id };
+                    }
+                    return node.id === '#' ?{'project_id': pid1, 'page': <%= @page %>,  'limit':<%=@limit%>}  :    { 'parent_id' : node.id };
+                },
+                'dataFilter':function(data, type){
+                    data=JSON.parse(data);
+                    data.map(function(iss1){
+                        iss1.text= iss1.id +'_'+  iss1.subject +'_'+ iss1.created_on;
+                        iss1.state = {
+                            'opened' : false};
+                        iss1.children=true;
+
+
+
+                        return iss1;
+                      });
+                    return data;
+                }
+            }
+        }});
+
+
+  function open_all_issue() {
+      $('#jstree_div').jstree('open_all');
+  }
+    function close_all_issue() {
+        $('#jstree_div').jstree('close_all');
+    }
+</script>
+

@@ -1,0 +1,14 @@
+= redmine_issue_tree_tiny
+this is a redmine plugin.
+this is a redmine issue tree view plugin.
+this is used for learning how to write redmine plugin.
+
+this plugin tells you:
+how to add application_menu and project_menu;
+how to do issue query using IssueQuery and Issue.where.
+how to use Paginator to to pager.
+
+and:
+how to write locales.
+how to set routes.
+how to add javascripts and stylesheets and call from view.

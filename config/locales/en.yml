@@ -1,0 +1,6 @@
+# English strings go here for Rails i18n
+en:
+  # my_label: "My label"
+  issue_tree_title: "issue_tree_title"
+  collapse_all: "collapse_all"
+  expand_all: "expand_all"

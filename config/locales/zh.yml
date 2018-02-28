@@ -1,0 +1,6 @@
+# English strings go here for Rails i18n
+zh:
+  # my_label: "My label"
+  issue_tree_title: "问题树"
+  collapse_all: "折叠所有"
+  expand_all: "扩展所有"
